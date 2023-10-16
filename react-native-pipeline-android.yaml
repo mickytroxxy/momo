@@ -1,0 +1,165 @@
+trigger:
+  branches:
+    exclude:
+      - "*"
+pr: none
+jobs:
+  - job: Build
+    displayName: "Build Job"
+    pool:
+      vmImage: "macos-latest"
+    steps:
+      - task: JavaToolInstaller@0
+        inputs:
+          versionSpec: "11"
+          jdkArchitectureOption: "x64"
+          jdkSourceOption: "PreInstalled"
+      - script: |
+          yarn cache clean -f
+        displayName: "Clear Yarn Cache"
+      - task: NodeTool@0
+        displayName: "Install Node"
+        inputs:
+          versionSpec: "20.3.0"
+      - script: yarn install
+        displayName: "Install Dependencies"
+      - script: |
+          echo "Cleaning Gradle cache"
+          rm -rf $HOME/.gradle/caches/
+        displayName: "Clean Gradle Cache"
+      - script: |
+          echo "Setting up Gradle Wrapper"
+          cd android
+          ./gradlew wrapper --gradle-version 7.5.1
+          cd ..
+        displayName: "Set Gradle Version"
+      - script: |
+          echo "Building Android app"
+          cd android
+          ./gradlew assembleRelease
+          cd ..
+        displayName: "Build Android"
+      # - script: |
+      #     npm install -g appcenter-cli@latest
+      #     appcenter login --token $(APP_CENTER_ACCESS_TOKEN)
+      #     appcenter codepush release-react -a Niresh.S-mtn.com/MTN_MOMO -d Staging --mandatory --target-binary-version "40"
+      #   displayName: 'Upload to App Center'
+      - script: |
+          cp android/app/build/outputs/apk/release/app-release.apk $(Build.ArtifactStagingDirectory)/
+        displayName: "Copy Artifact"
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: "drop"
+          publishLocation: "Container"
+      - script: |
+          echo "Build successful! Any post-build steps can go here."
+        displayName: "Post-Build Steps"
+  - job: Release
+    displayName: "Release Job"
+    dependsOn: Build
+    pool:
+      vmImage: "macos-latest"
+    steps:
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: "current"
+          downloadType: "single"
+          artifactName: "drop"
+          downloadPath: "$(Build.ArtifactStagingDirectory)"
+      - script: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+          brew install jq
+          appCenterApiToken="$(APP_CENTER_ACCESS_TOKEN)"
+          appCenterOwnerName="Niresh.S-mtn.com"
+          appName="MTN_MOMO"
+          url="https://api.appcenter.ms/v0.1/apps/$appCenterOwnerName/$appName/uploads/releases"
+          apkPath="$(Build.ArtifactStagingDirectory)/drop/app-release.apk"
+          headers=(
+            "accept: application/json"
+            "X-API-Token: $appCenterApiToken"
+            "Content-Type: application/json"
+            "Content-Length: 0"
+          )
+          response=$(curl -X POST -H "${headers[0]}" -H "${headers[1]}" -H "${headers[2]}" -H "${headers[3]}" $url)
+
+          id=$(jq -r '.id' <<< "$response")
+          package_asset_id=$(jq -r '.package_asset_id' <<< "$response")
+          upload_domain=$(jq -r '.upload_domain' <<< "$response")
+          token=$(jq -r '.token' <<< "$response")
+          url_encoded_token=$(jq -r '.url_encoded_token' <<< "$response")
+
+          FILE_NAME="app-release.apk"
+          FILE_SIZE_BYTES=$(wc -c $apkPath | awk '{print $1}')
+
+          APP_TYPE='application/vnd.android.package-archive'
+          METADATA_URL="https://file.appcenter.ms/upload/set_metadata/$package_asset_id?file_name=$FILE_NAME&file_size=$FILE_SIZE_BYTES&token=$url_encoded_token&content_type=$APP_TYPE"
+          response_metadata_url=$(curl -s -d POST -H "Content-Type: application/json" -H "Accept: application/json" -H "X-API-Token: $appCenterApiToken" $METADATA_URL)
+
+          echo "$response_metadata_url"
+
+          error=$(jq -r '.error' <<< "$response_metadata_url")
+          metadata_url_id=$(jq -r '.id' <<< "$response_metadata_url")
+          chunk_size=$(jq -r '.chunk_size' <<< "$response_metadata_url")
+          resume_restart=$(jq -r '.resume_restart' <<< "$response_metadata_url")
+          chunk_list=$(jq -r '.chunk_list' <<< "$response_metadata_url")
+          blob_partitions=$(jq -r '.blob_partitions' <<< "$response_metadata_url")
+          status_code=$(jq -r '.status_code' <<< "$response_metadata_url")
+
+          echo "APK PATH: $apkPath"
+          if [ -f "$apkPath" ]; then
+            FILE_SIZE=$(stat -f%z "$apkPath")
+            echo "File size: $FILE_SIZE bytes"
+          else
+            echo "File is not present."
+          fi
+
+          mkdir temp
+          
+          
+          split -b $chunk_size $apkPath temp/split
+
+          BLOCK_NUMBER=0
+          for i in temp/*
+          do
+            BLOCK_NUMBER=$(($BLOCK_NUMBER + 1))
+            CONTENT_LENGTH=$(wc -c "$i" | awk '{print $1}')
+            UPLOAD_CHUNK_URL="https://file.appcenter.ms/upload/upload_chunk/$package_asset_id?token=$url_encoded_token&block_number=$BLOCK_NUMBER"
+            curl -X POST $UPLOAD_CHUNK_URL --data-binary "@$i" -H "Content-Length: $CONTENT_LENGTH" -H "Content-Type: $APP_TYPE"
+          done
+
+          FINISHED_URL="https://file.appcenter.ms/upload/finished/$package_asset_id?token=$url_encoded_token"
+          response_finished_url=$(curl -d POST -H "Content-Type: application/json" -H "Accept: application/json" -H "X-API-Token: $appCenterApiToken" $FINISHED_URL)
+          echo "Response finished url ---:"
+          echo $response_finished_url
+
+          COMMIT_URL="https://api.appcenter.ms/v0.1/apps/$appCenterOwnerName/$appName/uploads/releases/$id"
+          response_commit_url=$(curl -H "Content-Type: application/json" -H "Accept: application/json" -H "X-API-Token: $appCenterApiToken" --data '{"upload_status": "uploadFinished","id": "$id"}' -X PATCH $COMMIT_URL)
+          echo "Response commit url -----:"
+          echo $response_commit_url
+
+          upload_id=$(echo $response_commit_url | jq -r '.id')
+
+          if [[ $upload_id == null ]];
+          then
+            echo "Failed to get upload ID from App Center"
+            exit 1
+          fi
+
+          RELEASE_STATUS_URL="https://api.appcenter.ms/v0.1/apps/$appCenterOwnerName/$appName/uploads/releases/$upload_id"
+          POLL_RESULT=$(curl -s -H "Content-Type: application/json" -H "Accept: application/json" -H "X-API-Token: $appCenterApiToken" $RELEASE_STATUS_URL)
+          echo "POLL RESULT -----------:"
+          echo "$POLL_RESULT"
+
+          RELEASE_ID=$(jq -r '.release_distinct_id' <<< "$POLL_RESULT")
+          if [[ $RELEASE_ID == null ]];
+          then
+            echo "Failed to find release from appcenter"
+            exit 1
+          fi
+
+          DISTRIBUTE_URL="https://api.appcenter.ms/v0.1/apps/$appCenterOwnerName/$appName/releases/$RELEASE_ID"
+          response_distribute_url=$(curl -H "Content-Type: application/json" -H "Accept: application/json" -H "X-API-Token: $appCenterApiToken" --data '{"destinations": [{ "name": "'"MoMoConsumerTesters"'"}] }' -X PATCH $DISTRIBUTE_URL)
+          echo "response distribute url ----"
+          echo $response_distribute_url
+        displayName: "Upload APK to App Center"

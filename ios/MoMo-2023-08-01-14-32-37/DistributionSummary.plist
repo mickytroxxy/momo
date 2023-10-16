@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MoMo.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>C26748FEA2495287FF433DBAF04C68E3659B28E2</string>
+				<key>dateExpires</key>
+				<string>15/05/2026</string>
+				<key>type</key>
+				<string>Cloud Managed iOS Distribution</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>0.12.0</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>C26748FEA2495287FF433DBAF04C68E3659B28E2</string>
+						<key>dateExpires</key>
+						<string>15/05/2026</string>
+						<key>type</key>
+						<string>Cloud Managed iOS Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>hermes.framework</string>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>C9B53S5RY8</string>
+						<key>name</key>
+						<string>Comviva Technologies Limited (Enterprise)</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>0.12.0</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>C9B53S5RY8.com.mtn.momo.consumer.dev</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>C9B53S5RY8</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>MoMo.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>d652cccd-68ef-4d77-a120-8c4c4fe630f3</string>
+				<key>dateExpires</key>
+				<string>07/07/2024</string>
+				<key>name</key>
+				<string>iOS Team Inhouse Provisioning Profile: com.mtn.momo.consumer.dev</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>C9B53S5RY8</string>
+				<key>name</key>
+				<string>Comviva Technologies Limited (Enterprise)</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>

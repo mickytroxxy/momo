@@ -1,0 +1,13 @@
+<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="15" cy="15" r="15" fill="#FFCB05" />
+    <path fill-rule="evenodd" clip-rule="evenodd"
+        d="M7.5 13C8.8809 13 10 14.1191 10 15.5C10 16.8802 8.8809 18 7.5 18C6.1191 18 5 16.8802 5 15.5C5 14.1191 6.1191 13 7.5 13Z"
+        fill="currentColor" />
+    <path fill-rule="evenodd" clip-rule="evenodd"
+        d="M15.5 13C16.8809 13 18 14.1191 18 15.5C18 16.8802 16.8809 18 15.5 18C14.1191 18 13 16.8802 13 15.5C13 14.1191 14.1191 13 15.5 13Z"
+        fill="currentColor" />
+    <path fill-rule="evenodd" clip-rule="evenodd"
+        d="M23.5 13C24.8809 13 26 14.1191 26 15.5C26 16.8802 24.8809 18 23.5 18C22.1191 18 21 16.8802 21 15.5C21 14.1191 22.1191 13 23.5 13Z"
+        fill="currentColor" />
+</svg>
+    

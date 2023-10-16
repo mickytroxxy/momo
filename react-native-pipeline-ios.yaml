@@ -1,0 +1,81 @@
+trigger:
+  branches:
+    exclude:
+      - '*'
+
+pool:
+  vmImage: 'macos-latest'
+
+steps:
+- script: |
+    yarn cache clean -f
+  displayName: 'Clear Yarn Cache'
+
+- task: NodeTool@0
+  displayName: 'Install Node'
+  inputs:
+    versionSpec: '20.3.0'
+
+- script: yarn install
+  displayName: 'Install Dependencies'
+
+- script: |
+    echo "Xcode clean"
+    cd ios
+    xcodebuild clean
+    cd ..
+  displayName: 'Xcode clean'
+
+- script: |
+    sudo gem install cocoapods
+    pod --version
+  displayName: 'Install/Update CocoaPods'
+
+
+# # Remove react-native-tcp package
+# - script: |
+#     yarn remove react-native-tcp
+#   displayName: 'Remove react-native-tcp'
+
+# - script: |
+#     yarn add react-native-tcp-socket
+#   displayName: 'install react-native-tcp-socket'
+
+- script: |
+    echo "Deintegrating CocoaPods"
+    cd ios
+    rm -rf ~/Library/Caches/CocoaPods
+    rm -rf Pods
+    rm -rf ~/Library/Developer/Xcode/DerivedData/*
+    pod deintegrate
+    pod setup
+    pod install
+    cd ..
+  displayName: 'CocoaPods Cleanup and Reinstallation'
+
+# - script: |
+#     echo "Deleting CocoaAsyncSocket library"
+#     rm -rf node_modules/react-native-tcp/ios/CocoaAsyncSocket
+#   displayName: 'Delete CocoaAsyncSocket Library'
+  
+- script: npx react-native run-ios
+  displayName: 'Build iOS'
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+
+- script: |
+    pwd
+    npm install -g appcenter-cli
+    pwd
+    appcenter login --token $(APP_CENTER_USER_ACCESS_TOKEN)
+    pwd
+    appcenter codepush release-react -a Niresh.S-mtn.com/MTN_MOMO -d Staging --mandatory --target-binary-version "2.0"
+    pwd
+    xcodebuild -workspace ios/MoMo.xcworkspace -scheme MoMo -configuration Release -archivePath build/MoMo.xcarchive archive
+    pwd
+    xcodebuild -exportArchive -archivePath build/MoMo.xcarchive -exportPath build/MoMo -exportOptionsPlist
+    pwd
+    appcenter distribute release -f build/MoMo.ipa -g MoMoConsumerTesters -d staging --app Niresh.S-mtn.com/MTN_MOMO --token $(APP_CENTER_USER_ACCESS_TOKEN)
+    pwd
+  displayName: 'Upload to App Center'
+  env:
+    APP_CENTER_ACCESS_TOKEN: $(APP_CENTER_USER_ACCESS_TOKEN)

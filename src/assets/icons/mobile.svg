@@ -1,0 +1,14 @@
+<svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<g id="Outline" clip-path="url(#clip0_256_52371)">
+		<g id="Group 19982">
+			<path id="Vector 120" d="M18 3.5V18V21.5C18 22.0523 17.5523 22.5 17 22.5H7C6.44772 22.5 6 22.0523 6 21.5V3.5C6 2.94772 6.44772 2.5 7 2.5H17C17.5523 2.5 18 2.94772 18 3.5Z" stroke="#004F71" stroke-linecap="round" />
+		</g>
+		<path id="Vector 121" d="M10 4.5H12H14" stroke="#004F71" stroke-linecap="round" />
+		<circle id="Ellipse 58" cx="12" cy="20" r="0.5" fill="#004F71" />
+	</g>
+	<defs>
+		<clipPath id="clip0_256_52371">
+			<rect width="24" height="24" fill="white" transform="translate(0 0.5)" />
+		</clipPath>
+	</defs>
+</svg>

@@ -1,0 +1,16 @@
+trigger:
+  branches:
+    include:
+      - master
+variables:
+  - group: Mobile # change it to the name you have set
+pool:
+  vmImage: 'macos-latest'
+steps:
+  - checkout: self
+    persistCredentials: true
+    clean: true
+  - task: NodeTool@0
+    displayName: 'Install Node'
+    inputs:
+      versionSpec: '12.19.0' # you can use your desired version here

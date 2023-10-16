@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@molecule": ["src/component/molecule/index"],
+      "@atom": ["src/component/atom/index"],
+      "@zod": ["src/utils/zod/index"],
+      "@zod/*": ["src/utils/zod/*"],
+      "@organisms": ["src/component/organisms/index"],
+      "@/*": ["src/*"]
+    }
+  }
+}

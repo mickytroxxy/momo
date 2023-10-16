@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>352789875804-u34bloqmj09e0e8brpgmg8ldjmnpe603.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.352789875804-u34bloqmj09e0e8brpgmg8ldjmnpe603</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>352789875804-ca8k1h9h30j35gbllt7sagifcc0mdk1e.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB4shjMUlRW0UGIyBi5IZlm6YRzkQzg9p8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>352789875804</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.mtn.momo.consumer.dev</string>
+	<key>PROJECT_ID</key>
+	<string>momo-dev-395b8</string>
+	<key>STORAGE_BUCKET</key>
+	<string>momo-dev-395b8.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:352789875804:ios:338742590e0141c3b96a99</string>
+</dict>
+</plist>
